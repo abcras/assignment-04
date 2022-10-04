@@ -16,7 +16,7 @@ public class WorkItemRepository : IWorkItemRepository
 
         if (entity is null)
         {
-            entity = new WorkItem ( task.Title);
+            entity = new WorkItem(task.Title);
 
             /*context.WorkItems.Add(entity);
             context.SaveChanges();*/
@@ -57,7 +57,22 @@ public class WorkItemRepository : IWorkItemRepository
 
     public WorkItemDetailsDTO Find(int itemId)
     {
-        throw new NotImplementedException();
+        var entity = context.Items.Where(o => o.Id == itemId).First();
+
+        WorkItemDetailsDTO detailsDTO =
+            new WorkItemDetailsDTO(
+            entity.Id,
+            entity.Title,
+            "",
+            DateTime.UtcNow,
+            entity.AssignedTo.Name,
+            (IReadOnlyCollection<string>)entity.Tags,
+            entity.State,
+            DateTime.UtcNow
+            );
+        //This is slightly broken because WorkItem does not have a description nor a Created time nor a StateUpdated time
+
+        return detailsDTO;
     }
 
     public IReadOnlyCollection<WorkItemDTO> Read()
