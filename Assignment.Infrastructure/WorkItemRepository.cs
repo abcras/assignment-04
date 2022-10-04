@@ -75,19 +75,33 @@ public class WorkItemRepository : IWorkItemRepository
     }
 
     public IReadOnlyCollection<WorkItemDTO> Read()
-        => _context.Set<WorkItem>().Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
+        => _context.Set<WorkItem>()
+        .Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State))
+        .ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadByState(State state)
-        => _context.Set<WorkItem>().Where(o => o.State == state).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
+        => _context.Set<WorkItem>()
+        .Where(o => o.State == state)
+        .Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State))
+        .ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadByTag(string tag)
-        => _context.Set<WorkItem>().Where(t => t.Tags.Any(o => o.Name == tag)).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
+        => _context.Set<WorkItem>()
+        .Where(t => t.Tags.Any(o => o.Name == tag))
+        .Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State))
+        .ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadByUser(int userId)
-        => _context.Set<WorkItem>().Where(t => t.AssignedToId == userId).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
+        => _context.Set<WorkItem>()
+        .Where(t => t.AssignedToId == userId)
+        .Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State))
+        .ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadRemoved()
-        => _context.Set<WorkItem>().Where(o => o.State == State.Removed).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
+        => _context.Set<WorkItem>()
+        .Where(o => o.State == State.Removed)
+        .Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State))
+        .ToList();
 
     public Response Update(WorkItemUpdateDTO task)
     {
@@ -109,8 +123,9 @@ public class WorkItemRepository : IWorkItemRepository
         }
         else
         {
+            entity.AssignedToId = task.AssignedToId;
             entity.AssignedTo = task.AssignedToId is not null ? _context.Set<User>().Find(task.AssignedToId) : entity.AssignedTo;
-            //entity.Description = task.Description is not null ? task.Description : entity.Description;
+            entity.Description = task.Description ?? entity.Description;
 
             if (task.Tags is not null)
             {

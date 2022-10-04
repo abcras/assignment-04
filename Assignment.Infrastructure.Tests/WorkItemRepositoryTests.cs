@@ -26,9 +26,9 @@ public class WorkItemRepositoryTests : IDisposable
         _context.Tags.AddRange(cleaning, urgent, TBD);
 
         //Tasks
-        var task1 = new WorkItem("Clean Office", "test") { Id = 1, State = State.Active };
+        var task1 = new WorkItem("Clean Office", "test") { Id = 1, AssignedToId = 1, State = State.Active };
         var task2 = new WorkItem("Do Taxes", "test") { Id = 2, State = State.New };
-        var task3 = new WorkItem("Go For A Run", "test") { Id = 3, State = State.Resolved };
+        var task3 = new WorkItem("Go For A Run", "test") { Id = 3, State = State.Resolved, Tags = new[] { TBD } };
         _context.Items.AddRange(task1, task2, task3);
 
         var user1 = new User("Brian", "br@itu.dk") { Id = 1 };
@@ -134,34 +134,48 @@ public class WorkItemRepositoryTests : IDisposable
     {
         _workItemRepository.Read().Should().BeEquivalentTo(new List<WorkItemDTO>()
         {
-            new WorkItemDTO { Id = 1, Title = "Clean Office", AssignedToName = "", State = State.Active },
-            new WorkItemDTO { Id = 2, Title = "Do Taxes", AssignedToName = "", State = State.New },
-            new WorkItemDTO { Id = 3, Title = "Go For A Run", AssignedToName = "", State = State.Resolved }
+            new WorkItemDTO(1, "Clean Office", "Brian", new string[0], State.Active),
+            new WorkItemDTO(2, "Do Taxes", null, new string[0], State.New),
+            new WorkItemDTO(3, "Go For A Run", null, new string[] { "TBD" }, State.Resolved)
         });
     }
 
     [Fact]
     public void ReadByState()
     {
-        _workItemRepository.ReadByState(State.New).Should().BeEquivalentTo(new List<WorkItemDTO>());
+        _workItemRepository.ReadByState(State.New).Should().BeEquivalentTo(new List<WorkItemDTO>()
+        {
+            new WorkItemDTO(2, "Do Taxes", null, new string[0], State.New)
+        });
     }
 
     [Fact]
     public void ReadByTag()
     {
-        _workItemRepository.ReadByTag("TBD").Should().BeEquivalentTo(new List<WorkItemDTO>());
+        _workItemRepository.ReadByTag("TBD").Should().BeEquivalentTo(new List<WorkItemDTO>()
+        {
+            new WorkItemDTO(3, "Go For A Run", null, new string[] { "TBD" }, State.Resolved)
+        });
     }
 
     [Fact]
     public void ReadByUser()
     {
-        _workItemRepository.ReadByUser(1).Should().BeEquivalentTo(new List<WorkItemDTO>());
+        _workItemRepository.ReadByUser(1).Should().BeEquivalentTo(new List<WorkItemDTO>()
+        {
+            new WorkItemDTO(1, "Clean Office", "Brian", new string[0], State.Active),
+        });
     }
 
     [Fact]
     public void ReadRemoved()
     {
-        _workItemRepository.Read().Should().BeEquivalentTo(new List<WorkItemDTO>());
+        _workItemRepository.Read().Should().BeEquivalentTo(new List<WorkItemDTO>()
+        {
+            new WorkItemDTO(1, "Clean Office", "Brian", new string[0], State.Active),
+            new WorkItemDTO(2, "Do Taxes", null, new string[0], State.New),
+            new WorkItemDTO(3, "Go For A Run", null, new string[] { "TBD" }, State.Resolved)
+        });
     }
 
     public void Dispose()
