@@ -21,7 +21,7 @@ public class UserRepositoryTests : IDisposable
 
         _context.Users.AddRange(
             new User("rafa", "rafa"),
-            new User("jouj", "jouj") { Items = new []{new WorkItem("task1")}},
+            new User("jouj", "jouj") { Items = new []{new WorkItem("task1", "test")}},
             new User("bemi", "bemi"));
         _context.SaveChanges();
     }

@@ -70,8 +70,8 @@ public class TagRepositoryTests : IDisposable
     [Fact]
     public void Delete_tag_in_use_without_using_force_should_give_conflict()
     {
-        var task1 = new WorkItem("Clean Office") { Id = 1, State = State.Active };
-        var task2 = new WorkItem("Do Taxes") { Id = 2, State = State.New };
+        var task1 = new WorkItem("Clean Office", "test") { Id = 1, State = State.Active };
+        var task2 = new WorkItem("Do Taxes", "test") { Id = 2, State = State.New };
         var list = new List<WorkItem> { task1, task2 };
         _context.Tags.Find(1)!.WorkItems = list;
 
