@@ -129,6 +129,41 @@ public class WorkItemRepositoryTests : IDisposable
 
     }
 
+    [Fact]
+    public void Read()
+    {
+        _workItemRepository.Read().Should().BeEquivalentTo(new List<WorkItemDTO>()
+        {
+            new WorkItemDTO { Id = 1, Title = "Clean Office", AssignedToName = "", State = State.Active },
+            new WorkItemDTO { Id = 2, Title = "Do Taxes", AssignedToName = "", State = State.New },
+            new WorkItemDTO { Id = 3, Title = "Go For A Run", AssignedToName = "", State = State.Resolved }
+        });
+    }
+
+    [Fact]
+    public void ReadByState()
+    {
+        _workItemRepository.ReadByState(State.New).Should().BeEquivalentTo(new List<WorkItemDTO>());
+    }
+
+    [Fact]
+    public void ReadByTag()
+    {
+        _workItemRepository.ReadByTag("TBD").Should().BeEquivalentTo(new List<WorkItemDTO>());
+    }
+
+    [Fact]
+    public void ReadByUser()
+    {
+        _workItemRepository.ReadByUser(1).Should().BeEquivalentTo(new List<WorkItemDTO>());
+    }
+
+    [Fact]
+    public void ReadRemoved()
+    {
+        _workItemRepository.Read().Should().BeEquivalentTo(new List<WorkItemDTO>());
+    }
+
     public void Dispose()
     {
         _context.Dispose();

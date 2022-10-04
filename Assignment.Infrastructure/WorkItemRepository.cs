@@ -70,7 +70,6 @@ public class WorkItemRepository : IWorkItemRepository
             entity.State,
             entity.StateUpdated
             );
-        //This is slightly broken because WorkItem does not have a description nor a Created time nor a StateUpdated time
 
         return detailsDTO;
     }
