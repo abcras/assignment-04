@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Assignment3.Entities;
+namespace Assignment.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
@@ -18,21 +18,17 @@ public class UserRepository : IUserRepository
             return (Response.Conflict, -1);
         }
 
-        var entry = _context.Users.Add(new User
-        {
-            Email = user.Email,
-            Name = user.Name,
-        });
+        var entry = _context.Users.Add(new User(user.Email, user.Name));
 
         _context.SaveChanges();
 
         return (Response.Created, entry.Entity.Id);
     }
 
-    public IReadOnlyCollection<UserDTO> ReadAll()
+    public IReadOnlyCollection<UserDTO> Read()
         => _context.Users.Select(u => new UserDTO(u.Id, u.Name, u.Email)).ToImmutableArray();
 
-    public UserDTO Read(int userId)
+    public UserDTO Find(int userId)
         => _context.Users.FirstOrDefault(u => u.Id == userId) is not { } entity
             ? null
             : new UserDTO(entity.Id, entity.Name, entity.Email);
@@ -63,7 +59,7 @@ public class UserRepository : IUserRepository
             return Response.NotFound;
         }
 
-        if (entity.Tasks?.Count > 0 && !force)
+        if (entity.Items?.Count > 0 && !force)
         {
             return Response.Conflict;
         }
