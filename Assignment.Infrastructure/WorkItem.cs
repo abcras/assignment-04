@@ -37,6 +37,6 @@ public class WorkItem
         Title = title;
         Description = description;
         Tags = new HashSet<Tag>();
-        StateUpdated = DateTime.UtcNow;
+        State = State.New;
     }
 }
