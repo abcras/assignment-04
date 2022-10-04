@@ -67,7 +67,7 @@ public class WorkItemRepository : IWorkItemRepository
             entity.Title,
             entity.Description,
             entity.Created,
-            entity.AssignedTo.Name,
+            entity.AssignedTo?.Name,
             entity.Tags.Select(c => c.Name).ToList(),
             entity.State,
             entity.StateUpdated
