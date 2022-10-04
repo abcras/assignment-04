@@ -1,25 +1,25 @@
-namespace Assignment3.Entities;
+namespace Assignment.Infrastructure;
 
-public class TaskRepository : ITaskRepository
+public class WorkItemRepository : IWorkItemRepository
 {
     KanbanContext context;
 
-    public TaskRepository(KanbanContext context)
+    public WorkItemRepository(KanbanContext context)
     {
         this.context = context;
     }
 
-    public (Response Response, int TaskId) Create(TaskCreateDTO task)
+    public (Response Response, int ItemId) Create(WorkItemCreateDTO task)
     {
-        var entity = context.Tasks.FirstOrDefault(c => c.Title == task.Title);
+        var entity = context.Items.FirstOrDefault(c => c.Title == task.Title);
         Response response;
 
         if (entity is null)
         {
-            entity = new Task { Title = task.Title, State = State.New };
+            entity = new WorkItem ( task.Title);
 
-            context.Tasks.Add(entity);
-            context.SaveChanges();
+            /*context.WorkItems.Add(entity);
+            context.SaveChanges();*/
 
             response = Response.Created;
         }
@@ -30,9 +30,9 @@ public class TaskRepository : ITaskRepository
         return (response, entity.Id);
     }
 
-    public Response Delete(int taskId)
+    public Response Delete(int itemId)
     {
-        var entity = context.Tasks.FirstOrDefault(c => c.Id == taskId);
+        var entity = context.Items.FirstOrDefault(c => c.Id == itemId);
 
         switch (entity?.State)
         {
@@ -45,7 +45,7 @@ public class TaskRepository : ITaskRepository
             case State.Removed:
                 return Response.Conflict;
             case State.New:
-                context.Tasks.Remove(entity);
+                context.Items.Remove(entity);
                 context.SaveChanges();
                 return Response.Deleted;
             case null:
@@ -55,39 +55,39 @@ public class TaskRepository : ITaskRepository
         }
     }
 
-    public TaskDetailsDTO Read(int taskId)
+    public WorkItemDetailsDTO Find(int itemId)
     {
         throw new NotImplementedException();
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAll()
+    public IReadOnlyCollection<WorkItemDTO> Read()
     {
         throw new NotImplementedException();
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllByState(State State)
+    public IReadOnlyCollection<WorkItemDTO> ReadByState(State state)
     {
         throw new NotImplementedException();
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
+    public IReadOnlyCollection<WorkItemDTO> ReadByTag(string tag)
     {
         throw new NotImplementedException();
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
+    public IReadOnlyCollection<WorkItemDTO> ReadByUser(int userId)
     {
         throw new NotImplementedException();
     }
 
-    public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
+    public IReadOnlyCollection<WorkItemDTO> ReadRemoved()
     {
         throw new NotImplementedException();
     }
 
-    public Response Update(TaskUpdateDTO task)
+    public Response Update(WorkItemUpdateDTO task)
     {
-        var entity = context.Tasks.Find(task.Id);
+        var entity = context.Items.Find(task.Id);
         Response response;
 
         if (entity is null)
@@ -95,7 +95,7 @@ public class TaskRepository : ITaskRepository
             response = Response.NotFound;
         }
         //if two tasks exists with the same titles but different ids
-        else if (context.Tasks.FirstOrDefault(t => t.Id != task.Id && t.Title == task.Title) != null)
+        else if (context.Items.FirstOrDefault(t => t.Id != task.Id && t.Title == task.Title) != null)
         {
             response = Response.Conflict;
         }
@@ -106,7 +106,7 @@ public class TaskRepository : ITaskRepository
         else
         {
             entity.AssignedTo = task.AssignedToId is not null ? context.Users.Find(task.AssignedToId) : entity.AssignedTo;
-            entity.Description = task.Description is not null ? task.Description : entity.Description;
+            //entity.Description = task.Description is not null ? task.Description : entity.Description;
 
 
             if (task.Tags is not null)
@@ -131,9 +131,5 @@ public class TaskRepository : ITaskRepository
         }
 
         return response;
-
-
-
-
     }
 }
