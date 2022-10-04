@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Assignment.Infrastructure;
 
 public class WorkItemRepository : IWorkItemRepository
@@ -16,10 +18,10 @@ public class WorkItemRepository : IWorkItemRepository
 
         if (entity is null)
         {
-            entity = new WorkItem(task.Title);
+            entity = new WorkItem(task.Title, task.Description!);
 
-            /*context.WorkItems.Add(entity);
-            context.SaveChanges();*/
+            context.Items.Add(entity);
+            context.SaveChanges();
 
             response = Response.Created;
         }
@@ -63,12 +65,12 @@ public class WorkItemRepository : IWorkItemRepository
             new WorkItemDetailsDTO(
             entity.Id,
             entity.Title,
-            "",
-            DateTime.UtcNow,
+            entity.Description,
+            entity.Created,
             entity.AssignedTo.Name,
-            (IReadOnlyCollection<string>)entity.Tags,
+            entity.Tags.Select(c => c.Name).ToList(),
             entity.State,
-            DateTime.UtcNow
+            entity.StateUpdated
             );
         //This is slightly broken because WorkItem does not have a description nor a Created time nor a StateUpdated time
 
@@ -77,27 +79,27 @@ public class WorkItemRepository : IWorkItemRepository
 
     public IReadOnlyCollection<WorkItemDTO> Read()
     {
-        throw new NotImplementedException();
+        return context.Items.Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
     }
 
     public IReadOnlyCollection<WorkItemDTO> ReadByState(State state)
     {
-        throw new NotImplementedException();
+        return context.Items.Where(o => o.State == state).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
     }
 
     public IReadOnlyCollection<WorkItemDTO> ReadByTag(string tag)
     {
-        throw new NotImplementedException();
+        return context.Items.Where(t => t.Tags.Any( o => o.Name == tag)).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
     }
 
     public IReadOnlyCollection<WorkItemDTO> ReadByUser(int userId)
     {
-        throw new NotImplementedException();
+        return context.Items.Where(t => t.AssignedToId == userId).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
     }
 
     public IReadOnlyCollection<WorkItemDTO> ReadRemoved()
     {
-        throw new NotImplementedException();
+        return context.Items.Where(o => o.State == State.Removed).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
     }
 
     public Response Update(WorkItemUpdateDTO task)
