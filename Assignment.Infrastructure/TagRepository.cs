@@ -1,4 +1,4 @@
-namespace Assignment3.Entities;
+namespace Assignment.Infrastructure;
 
 public class TagRepository : ITagRepository
 {
@@ -16,7 +16,7 @@ public class TagRepository : ITagRepository
 
         if (entity is null)
         {
-            entity = new Tag { Name = tag.Name };
+            entity = new Tag(tag.Name);
 
             _context.Tags.Add(entity);
             _context.SaveChanges();
@@ -38,7 +38,7 @@ public class TagRepository : ITagRepository
 
         if (entity is not null)
         {
-            if (entity.Tasks is not null)
+            if (entity.WorkItems is not null)
             {
                 if (!force)
                 {
@@ -66,7 +66,7 @@ public class TagRepository : ITagRepository
         return response;
     }
 
-    public TagDTO Read(int tagId)
+    public TagDTO Find(int tagId)
     {
         var tags = from t in _context.Tags
                    where t.Id == tagId
@@ -75,7 +75,7 @@ public class TagRepository : ITagRepository
         return tags.FirstOrDefault();
     }
 
-    public IReadOnlyCollection<TagDTO> ReadAll()
+    public IReadOnlyCollection<TagDTO> Read()
     {
         var tags = from t in _context.Tags
                    select new TagDTO(t.Id, t.Name);
