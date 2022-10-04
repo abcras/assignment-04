@@ -4,21 +4,21 @@ namespace Assignment.Infrastructure;
 
 public class UserRepository : IUserRepository
 {
-    private readonly KanbanContext _context;
+    private readonly DbContext _context;
 
-    public UserRepository(KanbanContext context)
+    public UserRepository(DbContext context)
     {
         _context = context;
     }
 
     public (Response Response, int UserId) Create(UserCreateDTO user)
     {
-        if (_context.Users.FirstOrDefault(u => u.Email == user.Email) is not null)
+        if (_context.Set<User>().FirstOrDefault(u => u.Email == user.Email) is not null)
         {
             return (Response.Conflict, -1);
         }
 
-        var entry = _context.Users.Add(new User(user.Email, user.Name));
+        var entry = _context.Set<User>().Add(new User(user.Email, user.Name));
 
         _context.SaveChanges();
 
@@ -26,21 +26,21 @@ public class UserRepository : IUserRepository
     }
 
     public IReadOnlyCollection<UserDTO> Read()
-        => _context.Users.Select(u => new UserDTO(u.Id, u.Name, u.Email)).ToImmutableArray();
+        => _context.Set<User>().Select(u => new UserDTO(u.Id, u.Name, u.Email)).ToImmutableArray();
 
     public UserDTO Find(int userId)
-        => _context.Users.FirstOrDefault(u => u.Id == userId) is not { } entity
+        => _context.Set<User>().FirstOrDefault(u => u.Id == userId) is not { } entity
             ? null
             : new UserDTO(entity.Id, entity.Name, entity.Email);
 
     public Response Update(UserUpdateDTO user)
     {
-        if (_context.Users.FirstOrDefault(u => u.Email == user.Email) is not null)
+        if (_context.Set<User>().FirstOrDefault(u => u.Email == user.Email) is not null)
         {
             return Response.Conflict;
         }
 
-        if (_context.Users.FirstOrDefault(u => u.Id == user.Id) is not { } entity)
+        if (_context.Set<User>().FirstOrDefault(u => u.Id == user.Id) is not { } entity)
         {
             return Response.NotFound;
         }
@@ -54,7 +54,7 @@ public class UserRepository : IUserRepository
 
     public Response Delete(int userId, bool force = false)
     {
-        if (_context.Users.FirstOrDefault(u => u.Id == userId) is not { } entity)
+        if (_context.Set<User>().FirstOrDefault(u => u.Id == userId) is not { } entity)
         {
             return Response.NotFound;
         }
@@ -64,7 +64,7 @@ public class UserRepository : IUserRepository
             return Response.Conflict;
         }
 
-        _context.Users.Remove(entity);
+        _context.Set<User>().Remove(entity);
         _context.SaveChanges();
 
         return Response.Deleted;

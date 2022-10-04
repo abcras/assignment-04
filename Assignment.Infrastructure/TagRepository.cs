@@ -2,23 +2,23 @@ namespace Assignment.Infrastructure;
 
 public class TagRepository : ITagRepository
 {
-    private readonly KanbanContext _context;
+    private readonly DbContext _context;
 
-    public TagRepository(KanbanContext context)
+    public TagRepository(DbContext context)
     {
         _context = context;
     }
 
     public (Response Response, int TagId) Create(TagCreateDTO tag)
     {
-        var entity = _context.Tags.FirstOrDefault(c => c.Name == tag.Name);
+        var entity = _context.Set<Tag>().FirstOrDefault(c => c.Name == tag.Name);
         Response response;
 
         if (entity is null)
         {
             entity = new Tag(tag.Name);
 
-            _context.Tags.Add(entity);
+            _context.Set<Tag>().Add(entity);
             _context.SaveChanges();
 
             response = Response.Created;
@@ -33,7 +33,7 @@ public class TagRepository : ITagRepository
 
     public Response Delete(int tagId, bool force = false)
     {
-        var entity = _context.Tags.FirstOrDefault(c => c.Id == tagId);
+        var entity = _context.Set<Tag>().FirstOrDefault(c => c.Id == tagId);
         Response response;
 
         if (entity is not null)
@@ -46,14 +46,14 @@ public class TagRepository : ITagRepository
                 }
                 else
                 {
-                    _context.Tags.Remove(entity);
+                    _context.Set<Tag>().Remove(entity);
                     _context.SaveChanges();
                     response = Response.Deleted;
                 }
             }
             else
             {
-                _context.Tags.Remove(entity);
+                _context.Set<Tag>().Remove(entity);
                 _context.SaveChanges();
                 response = Response.Deleted;
             }
@@ -68,7 +68,7 @@ public class TagRepository : ITagRepository
 
     public TagDTO Find(int tagId)
     {
-        var tags = from t in _context.Tags
+        var tags = from t in _context.Set<Tag>()
                    where t.Id == tagId
                    select new TagDTO(t.Id, t.Name);
 
@@ -77,7 +77,7 @@ public class TagRepository : ITagRepository
 
     public IReadOnlyCollection<TagDTO> Read()
     {
-        var tags = from t in _context.Tags
+        var tags = from t in _context.Set<Tag>()
                    select new TagDTO(t.Id, t.Name);
 
         return tags.ToList();
@@ -85,7 +85,7 @@ public class TagRepository : ITagRepository
 
     public Response Update(TagUpdateDTO tag)
     {
-        var entity = _context.Tags.Find(tag.Id);
+        var entity = _context.Set<Tag>().Find(tag.Id);
         Response response;
 
         if (entity is null)
@@ -93,7 +93,7 @@ public class TagRepository : ITagRepository
             response = Response.NotFound;
         }
         //if two tags exists with the same name but different ids
-        else if (_context.Tags.FirstOrDefault(t => t.Id != tag.Id && t.Name == tag.Name) != null)
+        else if (_context.Set<Tag>().FirstOrDefault(t => t.Id != tag.Id && t.Name == tag.Name) != null)
         {
             response = Response.Conflict;
         }
