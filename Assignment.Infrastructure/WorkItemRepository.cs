@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Assignment.Infrastructure;
 
 public class WorkItemRepository : IWorkItemRepository
@@ -78,29 +76,19 @@ public class WorkItemRepository : IWorkItemRepository
     }
 
     public IReadOnlyCollection<WorkItemDTO> Read()
-    {
-        return _context.Set<WorkItem>().Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
-    }
+        => _context.Set<WorkItem>().Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadByState(State state)
-    {
-        return _context.Set<WorkItem>().Where(o => o.State == state).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
-    }
+        => _context.Set<WorkItem>().Where(o => o.State == state).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadByTag(string tag)
-    {
-        return _context.Set<WorkItem>().Where(t => t.Tags.Any( o => o.Name == tag)).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
-    }
+        => _context.Set<WorkItem>().Where(t => t.Tags.Any(o => o.Name == tag)).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadByUser(int userId)
-    {
-        return _context.Set<WorkItem>().Where(t => t.AssignedToId == userId).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
-    }
+        => _context.Set<WorkItem>().Where(t => t.AssignedToId == userId).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
 
     public IReadOnlyCollection<WorkItemDTO> ReadRemoved()
-    {
-        return _context.Set<WorkItem>().Where(o => o.State == State.Removed).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
-    }
+        => _context.Set<WorkItem>().Where(o => o.State == State.Removed).Select(o => new WorkItemDTO(o.Id, o.Title, o.AssignedTo.Name, o.Tags.Select(c => c.Name).ToList(), o.State)).ToList();
 
     public Response Update(WorkItemUpdateDTO task)
     {

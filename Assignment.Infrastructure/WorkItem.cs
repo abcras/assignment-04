@@ -23,7 +23,7 @@ public class WorkItem
         set
         {
             StateUpdated = DateTime.UtcNow;
-           _state = value;
+            _state = value;
         }
     }
 
