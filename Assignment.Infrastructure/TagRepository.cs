@@ -38,7 +38,7 @@ public class TagRepository : ITagRepository
 
         if (entity is not null)
         {
-            if (entity.WorkItems is not null)
+            if (entity.WorkItems.Count() > 0)
             {
                 if (!force)
                 {
